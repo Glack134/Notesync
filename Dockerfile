@@ -24,3 +24,6 @@ RUN chmod +x main
 
 # Команда для запуска
 CMD ["./main"]
+
+
+#Start Postgresql in Docker ---> docker run --name=notesync-db -e POSTGRES_PASSWORD='password' -p "port" -d --rm postgres 
