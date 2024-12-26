@@ -20,7 +20,7 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user notesync.User) (int, error) {
 	user.Password = s.generatePasswordHash(user.Password)
-	return s.CreateUser(user)
+	return s.repo.CreateUser(user)
 }
 
 func (s *AuthService) generatePasswordHash(password string) string {
