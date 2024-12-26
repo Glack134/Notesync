@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/polyk005/notesync/pkg/service"
 )
@@ -16,6 +18,15 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	// Загрузка HTML-шаблонов
+	router.LoadHTMLGlob("templates/*")
+
+	// Обслуживание статических файлов
+	router.Static("/static", "./static")
+
+	router.GET("/main", h.mainHandler)
+
+	//остальные маршруты для блокнота
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
@@ -44,4 +55,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 
 	return router
+}
+
+func (h *Handler) mainHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "index.html", nil)
 }

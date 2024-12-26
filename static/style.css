@@ -1,0 +1,64 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Светлый фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Полная высота окна */
+}
+
+.container {
+    text-align: center; /* Центрирование текста */
+    opacity: 0; /* Начальное состояние (невидимо) */
+    transform: translateY(20px); /* Начальное смещение вниз */
+    animation: fadeInUp 0.8s forwards; /* Анимация появления */
+}
+
+.image-container {
+    margin-top: 20px; /* Отступ сверху */
+}
+
+img {
+    max-width: 80%; /* Максимальная ширина изображения */
+    height: auto; /* Автоматическая высота */
+    border: 2px solid #ccc; /* Рамка для изображения */
+    border-radius: 10px; /* Закругленные углы */
+    opacity: 0; /* Начальное состояние (невидимо) */
+    animation: fadeIn 1s forwards 0.5s; /* Анимация появления с задержкой */
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s; /* Плавный переход для фона и трансформации */
+}
+
+button:hover {
+    background-color: #007BFF; /* Цвет фона при наведении */
+    color: white; /* Цвет текста при наведении */
+    transform: scale(1.1); /* Увеличение при наведении */
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
