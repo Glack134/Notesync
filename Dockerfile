@@ -1,29 +1,22 @@
-# Используем образ Golang для сборки
+# Этап сборки
 FROM golang:1.22 AS builder
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем все файлы в рабочую директорию
+COPY go.mod go.sum ./
+RUN go mod download
+
 COPY . .
 
-# Сборка приложения
-RUN go build -o main ./cmd/main.go
+RUN go build -o main cmd/main.go
 
-# Используем более легкий образ для запуска
-FROM ubuntu:22.04
+# Этап выполнения
+FROM alpine:latest
 
-# Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем исполняемый файл из образа сборки
 COPY --from=builder /app/main .
 
-# Убедитесь, что файл исполняемый
-RUN chmod +x main
+EXPOSE 8080
 
-# Команда для запуска
 CMD ["./main"]
-
-
-#Start Postgresql in Docker ---> docker run --name=notesync-db -e POSTGRES_PASSWORD='password' -p "port" -d --rm postgres 
