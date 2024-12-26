@@ -1,8 +1,12 @@
 package service
 
-import "github.com/polyk005/notesync/pkg/repository"
+import (
+	"github.com/polyk005/notesync"
+	"github.com/polyk005/notesync/pkg/repository"
+)
 
-type Authoriation interface {
+type Authorization interface {
+	CreateUser(user notesync.User) (int, error)
 }
 
 type NotesyncList interface {
@@ -12,11 +16,13 @@ type NotesyncItem interface {
 }
 
 type Service struct {
-	Authoriation
+	Authorization
 	NotesyncList
 	NotesyncItem
 }
 
 func NewService(repos *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repos.Authorization),
+	}
 }
