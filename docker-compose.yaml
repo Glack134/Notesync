@@ -1,28 +1,25 @@
 services:
-  notesync:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - .:/app
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:17
+  db:
+    image: postgres:latest
     restart: always
     environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: midiy
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5434:5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwe230405180405
+      POSTGRES_DB: notesync
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5435:5432"
+
+  server:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:qwe230405180405@db:5432/your_database
 
 volumes:
   postgres_data:
