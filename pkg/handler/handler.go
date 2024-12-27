@@ -26,11 +26,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.GET("/main", h.mainHandler)
 
+	router.GET("/register", h.registerHandler)
+
 	//остальные маршруты для блокнота
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
-		auth.POST("/sign-in", h.signUp)
+		auth.POST("/sign-in", h.signIn)
 	}
 
 	api := router.Group("/api")
@@ -59,4 +61,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 func (h *Handler) mainHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
+}
+
+func (h *Handler) registerHandler(c *gin.Context) {
+	c.HTML(http.StatusOK, "register.html", nil)
 }
