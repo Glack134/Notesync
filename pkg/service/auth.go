@@ -3,12 +3,23 @@ package service
 import (
 	"crypto/sha1"
 	"fmt"
+	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/polyk005/notesync"
 	"github.com/polyk005/notesync/pkg/repository"
 )
 
-const salt = "6765fgvbhhgf35vfu9jft5tg"
+const (
+	salt       = "6765fgvbhhgf35vfu9jft5tg"
+	signingKey = "qjvkvnsjdnj2njn29njv**@9un19@!33"
+	tokenTTL   = 12 * time.Hour
+)
+
+type tokenClaims struct {
+	jwt.StandardClaims
+	UserId int `json:"user_id"`
+}
 
 type AuthService struct {
 	repo repository.Authorization
@@ -21,6 +32,22 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 func (s *AuthService) CreateUser(user notesync.User) (int, error) {
 	user.Password = s.generatePasswordHash(user.Password)
 	return s.repo.CreateUser(user)
+}
+
+func (s *AuthService) GenerateToken(username, password string) (string, error) {
+	user, err := s.repo.GetUser(username, s.generatePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		user.Id,
+	})
+	return token.SignedString([]byte(signingKey))
 }
 
 func (s *AuthService) generatePasswordHash(password string) string {
