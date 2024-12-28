@@ -14,6 +14,8 @@ type NotesyncList interface {
 	Create(userId int, list notesync.NotesyncList) (int, error)
 	GetAll(userId int) ([]notesync.NotesyncList, error)
 	GetById(userId, listId int) (notesync.NotesyncList, error)
+	Delete(userId, listId int) error
+	Update(userId, listId int, input notesync.UpdateListInput) error
 }
 
 type NotesyncItem interface {
