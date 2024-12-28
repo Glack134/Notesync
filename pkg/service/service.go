@@ -12,6 +12,9 @@ type Authorization interface {
 }
 
 type NotesyncList interface {
+	Create(userId int, list notesync.NotesyncList) (int, error)
+	GetAll(userId int) ([]notesync.NotesyncList, error)
+	GetById(userId, listId int) (notesync.NotesyncList, error)
 }
 
 type NotesyncItem interface {
@@ -26,5 +29,6 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		NotesyncList:  NewNotesyncListService(repos.NotesyncList),
 	}
 }

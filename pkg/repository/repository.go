@@ -11,6 +11,9 @@ type Authorization interface {
 }
 
 type NotesyncList interface {
+	Create(userId int, list notesync.NotesyncList) (int, error)
+	GetAll(userId int) ([]notesync.NotesyncList, error)
+	GetById(userId, listId int) (notesync.NotesyncList, error)
 }
 
 type NotesyncItem interface {
@@ -25,5 +28,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		NotesyncList:  NewNotesynsListPostgres(db),
 	}
 }
