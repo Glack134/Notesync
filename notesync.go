@@ -38,3 +38,13 @@ func (i UpdateListInput) Validate() error {
 	}
 	return nil
 }
+
+type UpdateItemInput struct {
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+	Done        *bool   `json:"done"`
+}
+
+func (i UpdateItemInput) Validate() error {
+	return nil
+}

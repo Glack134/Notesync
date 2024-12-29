@@ -22,6 +22,9 @@ type NotesyncList interface {
 type NotesyncItem interface {
 	Create(userId int, listId int, item notesync.NotesyncItem) (int, error)
 	GetAll(userId, listId int) ([]notesync.NotesyncItem, error)
+	GetById(UserId, itemId int) (notesync.NotesyncItem, error)
+	Delete(userId, itemId int) error
+	Update(userId, itemId int, input notesync.UpdateItemInput) error
 }
 
 type Service struct {
