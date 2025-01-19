@@ -1,25 +1,25 @@
-services:
-  db:
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: qwe230405180405
-      POSTGRES_DB: notesync
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5435:5432"
+version: '3.8'
 
-  server:
-    build: .
+services:
+
+  db:
     restart: always
+    image: postgres:latest
+    volumes:
+      - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=qwe230405180405
     ports:
-      - "8080:8080"
+      - 5436:5432
+
+  notesync:
+    build: ./
+    command: ./wait-for-postgres.sh db 5432 ./notesync  # Убедитесь, что это путь к вашему приложению
+    ports:
+      - 8081:8080
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgres://postgres:qwe230405180405@db:5432/your_database
-
-volumes:
-  postgres_data:
+      - DB_PASSWORD=qwe230405180405
+      - DB_HOST=db
+      - DB_PORT=5432

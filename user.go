@@ -2,7 +2,7 @@ package notesync
 
 type User struct {
 	Id       int    `json:"-" db:"id"`
-	Name     string `json:"name" binding:"required"`
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }

@@ -1,31 +1,22 @@
-# Используем официальный образ Go
-FROM golang:1.22 AS builder
+FROM golang:1.20-buster
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+RUN go version
+ENV GOPATH=/
 
-# Копируем файлы модуля и зависимостей
-COPY go.mod go.sum ./
+COPY ./ ./
+
+# install psql
+RUN apt-get update
+RUN apt-get -y install postgresql-client
+
+# make wait-for-postgres.sh executable
+RUN chmod +x wait-for-postgres.sh
+# Убедитесь, что путь правильный
+
+
+# build go app
 RUN go mod download
+RUN go build -o notesync ./cmd/main.go
 
-# Копируем все файлы приложения в контейнер
-COPY . .
-
-# Компилируем приложение
-RUN go build -o main ./cmd
-
-# Используем более легкий образ для запуска приложения
-FROM alpine:latest
-
-# Устанавливаем рабочую директорию
-WORKDIR /app
-
-# Копируем скомпилированное приложение из образа builder
-COPY --from=builder /app/main .
-
-# Открываем порт, который будет использоваться приложением
-EXPOSE 8080
-
-# Команда для запуска приложения
-CMD ["./main"]
+CMD ["./notesync"]
 
