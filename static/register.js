@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Автоматически заполняем поля для тестирования
-    document.getElementById('username').value = "polyыуlwыk0s05";
-    document.getElementById('password').value = "q2weerцыыty";
+    document.getElementById('username').value = "User1";
+    document.getElementById('password').value = "qwerty123";
 });
 
 // Остальной код остается прежним

@@ -47,3 +47,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		"token": token,
 	})
 }
+
+func (h *Handler) forgotPassword(c *gin.Context) {
+
+}

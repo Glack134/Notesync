@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   db:
     restart: always
     image: postgres:latest
@@ -14,12 +13,13 @@ services:
 
   notesync:
     build: ./
-    command: ./wait-for-postgres.sh db 5432 ./notesync  # Убедитесь, что это путь к вашему приложению
+    command: ["./notesync"]
     ports:
-      - 8081:8080
+      - 8080:8080
     depends_on:
       - db
     environment:
       - DB_PASSWORD=qwe230405180405
       - DB_HOST=db
       - DB_PORT=5432
+    platform: linux/amd64  # Убедитесь, что эта строка присутствует
