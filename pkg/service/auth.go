@@ -74,3 +74,47 @@ func (s *AuthService) generatePasswordHash(password string) string {
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
+
+func (s *AuthService) SendPasswordResetEmail(email string) error {
+	user, err := s.repo.GetUser ByEmail(email) // Обратите внимание на обновленное имя метода
+	if err != nil {
+		return errors.New("user not found")
+	}
+
+	resetToken := s.generatePasswordResetToken(user.Id)
+	resetLink := fmt.Sprintf("http://yourdomain.com/reset-password?token=%s", resetToken)
+
+	// Здесь вы можете использовать библиотеку для отправки email
+	err = sendEmail(email, "Password Reset", resetLink)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
+func (s *AuthService) generatePasswordResetToken(userId int) string {
+	// Генерация токена для сброса пароля (можно использовать JWT или другой метод)
+	// Пример простого токена (не безопасно для продакшена)
+	return fmt.Sprintf("reset-token-for-user-%d", userId)
+}
+
+func sendEmail(to, subject, body string) error {
+	from := "your-email@example.com"
+	password := "your-email-password"
+
+	// Настройки SMTP
+	smtpHost := "smtp.example.com"
+	smtpPort := "587"
+
+	message := []byte("Subject: " + subject + "\n" + body)
+
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
