@@ -48,6 +48,23 @@ func (h *Handler) signIn(c *gin.Context) {
 	})
 }
 
-func (h *Handler) forgotPassword(c *gin.Context) {
+type forgotPasswordInput struct {
+	Email string `json:"email" binding:"required"`
+}
 
+func (h *Handler) forgotPassword(c *gin.Context) {
+	var input forgotPasswordInput
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err := h.services.Authorization.SendPasswordResetEmail(input.Email)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset email sent"})
 }
