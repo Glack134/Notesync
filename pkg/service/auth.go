@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"net/smtp"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -76,5 +77,28 @@ func (s *AuthService) generatePasswordHash(password string) string {
 }
 
 func (s *AuthService) SendPasswordResetEmail(email string) error {
+	// Проверка на пустой email
+	if email == "" {
+		return errors.New("email cannot be empty")
+	}
+
+	// Настройки SMTP (пример для Gmail)
+	smtpHost := "smtp.mail.ru"
+	smtpPort := "587"
+	sender := "rbhb05@mail.ru"         // Замените на ваш адрес электронной почты
+	password := "Lvpbhiyaw6i9KGaWgePj" // Замените на ваш пароль или используйте App Password
+
+	// Создаем сообщение
+	subject := "Subject: Password Reset Request\n"
+	body := "Please click the link to reset your password: http://localhost:8080/auth/reset-password\n"
+	message := []byte(subject + "\n" + body)
+
+	// Отправляем email
+	auth := smtp.PlainAuth("", sender, password, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, sender, []string{email}, message)
+	if err != nil {
+		return fmt.Errorf("failed to send email: %w", err)
+	}
+
 	return nil
 }
