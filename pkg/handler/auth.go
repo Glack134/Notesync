@@ -49,17 +49,20 @@ func (h *Handler) signIn(c *gin.Context) {
 }
 
 type forgotPasswordInput struct {
-	Email string `json:"email" binding:"required"`
+	Email string `json:"email" binding:"required,email"`
 }
 
 func (h *Handler) forgotPassword(c *gin.Context) {
 	var input forgotPasswordInput
 
+	// Проверка на ошибки при связывании JSON
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
+	// Здесь предполагается, что у вас есть доступ к h.services.Authorization
+	// и SendPasswordResetEmail принимает только email
 	err := h.services.Authorization.SendPasswordResetEmail(input.Email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())

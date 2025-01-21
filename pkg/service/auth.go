@@ -81,6 +81,15 @@ func (s *AuthService) SendPasswordResetEmail(email string) error {
 	if email == "" {
 		return errors.New("email cannot be empty")
 	}
+	userID := 21
+	// Проверка существования пользователя
+	user, err := s.repo.FindUserByEmail(userID, email) // Предположим, у вас есть функция для поиска пользователя по email
+	if err != nil {
+		return fmt.Errorf("failed to find user: %w", err)
+	}
+	if user == (notesync.User{}) {
+		return errors.New("user not found")
+	}
 
 	// Настройки SMTP (пример для Gmail)
 	smtpHost := "smtp.mail.ru"
@@ -95,7 +104,7 @@ func (s *AuthService) SendPasswordResetEmail(email string) error {
 
 	// Отправляем email
 	auth := smtp.PlainAuth("", sender, password, smtpHost)
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, sender, []string{email}, message)
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, sender, []string{email}, message)
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
