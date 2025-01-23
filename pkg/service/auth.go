@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	"net/smtp"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -76,38 +75,22 @@ func (s *AuthService) generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-func (s *AuthService) SendPasswordResetEmail(email string) error {
-	// Проверка на пустой email
-	if email == "" {
-		return errors.New("email cannot be empty")
-	}
-	userID := 21
-	// Проверка существования пользователя
-	user, err := s.repo.FindUserByEmail(userID, email) // Предположим, у вас есть функция для поиска пользователя по email
-	if err != nil {
-		return fmt.Errorf("failed to find user: %w", err)
-	}
-	if user == (notesync.User{}) {
-		return errors.New("user not found")
-	}
+// Реализация метода GetEmailByResetToken
+func (s *AuthService) GetEmailByResetToken(token string) (string, error) {
+	return s.repo.GetEmailByResetToken(token)
+}
 
-	// Настройки SMTP (пример для Gmail)
-	smtpHost := "smtp.mail.ru"
-	smtpPort := "587"
-	sender := "rbhb05@mail.ru"         // Замените на ваш адрес электронной почты
-	password := "Lvpbhiyaw6i9KGaWgePj" // Замените на ваш пароль или используйте App Password
+// Реализация метода CreateResetToken
+func (s *AuthService) CreateResetToken(email string) (string, error) {
+	return s.repo.CreateResetToken(email)
+}
 
-	// Создаем сообщение
-	subject := "Subject: Password Reset Request\n"
-	body := "Please click the link to reset your password: http://localhost:8080/auth/reset-password\n"
-	message := []byte(subject + "\n" + body)
+// Реализация метода UpdatePassword
+func (s *AuthService) UpdatePassword(email, newPassword string) error {
+	return s.repo.UpdatePassword(email, newPassword)
+}
 
-	// Отправляем email
-	auth := smtp.PlainAuth("", sender, password, smtpHost)
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, sender, []string{email}, message)
-	if err != nil {
-		return fmt.Errorf("failed to send email: %w", err)
-	}
-
-	return nil
+// Реализация метода ResetPassword
+func (s *AuthService) ResetPassword(email string, newPassword string) error {
+	return s.repo.UpdatePassword(email, newPassword) // Переиспользуем UpdatePassword
 }

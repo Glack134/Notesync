@@ -9,7 +9,10 @@ type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
-	SendPasswordResetEmail(email string) error
+	CreateResetToken(email string) (string, error)
+	GetEmailByResetToken(token string) (string, error)
+	UpdatePassword(email, newPassword string) error
+	ResetPassword(email string, newPassword string) error
 }
 
 type NotesyncList interface {

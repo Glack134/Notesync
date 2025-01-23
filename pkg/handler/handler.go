@@ -26,14 +26,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.GET("/main", h.mainHandler)
 
-	router.GET("/register", h.registerHandler)
-
 	//остальные маршруты для блокнота
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
-		auth.POST("/forgot-password", h.forgotPassword)
+		auth.POST("/request-password-reset", h.requestPasswordReset) // Новый маршрут для запроса сброса пароля
+		auth.POST("/reset-password", h.resetPassword)                // Новый маршрут для сброса пароля
 	}
 
 	api := router.Group("/api", h.userIdentity)
@@ -65,8 +64,4 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 func (h *Handler) mainHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", nil)
-}
-
-func (h *Handler) registerHandler(c *gin.Context) {
-	c.HTML(http.StatusOK, "register.html", nil)
 }

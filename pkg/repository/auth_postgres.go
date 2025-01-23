@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -35,23 +36,52 @@ func (r *AuthPostgres) GetUser(username, password string) (notesync.User, error)
 	return user, err
 }
 
-func (r *AuthPostgres) FindUserByEmail(User int, email string) (notesync.User, error) {
-	var user notesync.User
-	query := "SELECT * FROM users WHERE id = $1 AND email = $2" // Предполагаем, что у вас есть колонка email
+// Реализация метода CreateResetToken
+func (r *AuthPostgres) CreateResetToken(email string) (string, error) {
+	// Генерация токена (например, с использованием UUID или другого метода)
+	token := generateToken() // Предполагается, что у вас есть функция для генерации токена
 
-	err := r.db.QueryRow(query, user, email).Scan(&user.Id, &user.Name, &user.Username, &user.Email, &user.Password)
+	// Сохранение токена в базу данных
+	query := "INSERT INTO reset_tokens (email, token) VALUES ($1, $2)"
+	_, err := r.db.Exec(query, email, token)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return user, nil // Пользователь не найден
-		}
-		return user, err // Возвращаем ошибку, если произошла другая ошибка
+		return "", err // Возвращаем ошибку, если не удалось сохранить токен
 	}
 
-	return user, nil
+	return token, nil // Возвращаем сгенерированный токен
 }
 
-func SendEmail(to string, subject string, body string) error {
-	// Реализуйте логику отправки email здесь
-	fmt.Printf("Sending email to: %s\nSubject: %s\nBody: %s\n", to, subject, body)
-	return nil
+// Реализация метода GetEmailByResetToken
+func (r *AuthPostgres) GetEmailByResetToken(token string) (string, error) {
+	var email string
+
+	// Запрос к базе данных для получения email по токену
+	query := "SELECT email FROM reset_tokens WHERE token = $1"
+	err := r.db.QueryRow(query, token).Scan(&email)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", errors.New("token not found") // Возвращаем ошибку, если токен не найден
+		}
+		return "", err // Возвращаем другую ошибку
+	}
+
+	return email, nil // Возвращаем найденный email
+}
+
+// Реализация метода UpdatePassword
+func (r *AuthPostgres) UpdatePassword(email, newPassword string) error {
+	// Обновление пароля в базе данных
+	query := "UPDATE users SET password = $1 WHERE email = $2"
+	_, err := r.db.Exec(query, newPassword, email)
+	if err != nil {
+		return err // Возвращаем ошибку, если не удалось обновить пароль
+	}
+
+	return nil // Возвращаем nil, если все прошло успешно
+}
+
+// Вспомогательная функция для генерации токена
+func generateToken() string {
+	// Ваша реализация генерации токена (например, с использованием UUID)
+	return "some-generated-token" // Замените на реальную генерацию
 }

@@ -48,26 +48,44 @@ func (h *Handler) signIn(c *gin.Context) {
 	})
 }
 
-type forgotPasswordInput struct {
-	Email string `json:"email" binding:"required,email"`
-}
+// auth.go
+func (h *Handler) requestPasswordReset(c *gin.Context) {
+	var input struct {
+		Email string `json:"email" binding:"required,email"`
+	}
 
-func (h *Handler) forgotPassword(c *gin.Context) {
-	var input forgotPasswordInput
-
-	// Проверка на ошибки при связывании JSON
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// Здесь предполагается, что у вас есть доступ к h.services.Authorization
-	// и SendPasswordResetEmail принимает только email
-	err := h.services.Authorization.SendPasswordResetEmail(input.Email)
+	_, err := h.services.Authorization.CreateResetToken(input.Email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Password reset email sent"})
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Reset token sent to your email",
+	})
+}
+
+func (h *Handler) resetPassword(c *gin.Context) {
+	var input struct {
+		Email       string `json:"email"`
+		NewPassword string `json:"new_password"`
+	}
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+		return
+	}
+
+	err := h.services.Authorization.ResetPassword(input.Email, input.NewPassword)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "password reset successfully"})
 }

@@ -8,7 +8,9 @@ import (
 type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GetUser(username string, password string) (notesync.User, error)
-	FindUserByEmail(userID int, email string) (notesync.User, error)
+	CreateResetToken(email string) (string, error)
+	GetEmailByResetToken(token string) (string, error)
+	UpdatePassword(email, newPassword string) error
 }
 
 type NotesyncList interface {
