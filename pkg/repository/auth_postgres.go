@@ -39,16 +39,16 @@ func (r *AuthPostgres) GetUser(username, password string) (notesync.User, error)
 // Реализация метода CreateResetToken
 func (r *AuthPostgres) CreateResetToken(email string) (string, error) {
 	// Генерация токена (например, с использованием UUID или другого метода)
-	token := generateToken() // Предполагается, что у вас есть функция для генерации токена
+	password1 := generateToken() // Предполагается, что у вас есть функция для генерации токена
 
 	// Сохранение токена в базу данных
-	query := "INSERT INTO reset_tokens (email, token) VALUES ($1, $2)"
-	_, err := r.db.Exec(query, email, token)
+	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
+	_, err := r.db.Exec(query, email)
 	if err != nil {
 		return "", err // Возвращаем ошибку, если не удалось сохранить токен
 	}
 
-	return token, nil // Возвращаем сгенерированный токен
+	return password1, nil // Возвращаем сгенерированный токен
 }
 
 // Реализация метода GetEmailByResetToken
