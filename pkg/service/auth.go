@@ -75,22 +75,23 @@ func (s *AuthService) generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-// Реализация метода GetEmailByResetToken
 func (s *AuthService) GetEmailByResetToken(token string) (string, error) {
 	return s.repo.GetEmailByResetToken(token)
 }
 
-// Реализация метода CreateResetToken
 func (s *AuthService) CreateResetToken(email string) (string, error) {
-	return s.repo.CreateResetToken(email)
+	resetToken, err := s.repo.CreateResetToken(email)
+	if err != nil {
+		return "", err
+	}
+
+	return resetToken, nil
 }
 
-// Реализация метода UpdatePassword
 func (s *AuthService) UpdatePassword(email, newPassword string) error {
 	return s.repo.UpdatePassword(email, newPassword)
 }
 
-// Реализация метода ResetPassword
 func (s *AuthService) ResetPassword(email string, newPassword string) error {
-	return s.repo.UpdatePassword(email, newPassword) // Переиспользуем UpdatePassword
+	return s.repo.UpdatePassword(email, newPassword)
 }

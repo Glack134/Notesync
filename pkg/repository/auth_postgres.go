@@ -50,10 +50,7 @@ func (r *AuthPostgres) CreateResetToken(email string) (string, error) {
 		return "", err
 	}
 
-	// Генерация токена (например, с использованием UUID или другого метода)
-	password1 := generateToken() // Предполагается, что у вас есть функция для генерации токена
-
-	return password1, nil // Возвращаем сгенерированный токен
+	return email, nil // Возвращаем сгенерированный токен
 }
 
 // Реализация метода GetEmailByResetToken
@@ -76,10 +73,4 @@ func (r *AuthPostgres) GetEmailByResetToken(token string) (string, error) {
 // Реализация метода UpdatePassword
 func (r *AuthPostgres) UpdatePassword(email, newPassword string) error {
 	return nil
-}
-
-// Вспомогательная функция для генерации токена
-func generateToken() string {
-	// Ваша реализация генерации токена (например, с использованием UUID)
-	return "some-generated-token" // Замените на реальную генерацию
 }
