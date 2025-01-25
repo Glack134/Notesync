@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/polyk005/notesync"
 	"github.com/polyk005/notesync/pkg/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -75,13 +76,9 @@ func (s *AuthService) generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-// Реализация метода GetEmailByResetToken
-func (s *AuthService) GetEmailByResetToken(token string) (string, error) {
-	email, err := s.repo.GetEmailByResetToken(token)
-	if err != nil {
-		return "", err
-	}
-	return email, nil
+func (s *AuthService) HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
 }
 
 // Реализация метода CreateResetToken
@@ -93,21 +90,7 @@ func (s *AuthService) CreateResetToken(email string) (string, error) {
 	return resetToken, nil
 }
 
-// Реализация метода UpdatePassword
-func (s *AuthService) UpdatePassword(email, newPassword string) error {
-	err := s.repo.UpdatePassword(email, newPassword)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // Реализация метода ResetPassword
 func (s *AuthService) ResetPassword(email, newPassword string) error {
-	// Здесь можно добавить дополнительную логику, если необходимо
-	err := s.repo.UpdatePassword(email, newPassword)
-	if err != nil {
-		return err
-	}
 	return nil
 }

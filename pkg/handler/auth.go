@@ -48,17 +48,19 @@ func (h *Handler) signIn(c *gin.Context) {
 	})
 }
 
+type requestResetPassword struct {
+	Email string `json:"email" binding:"required"`
+}
+
 func (h *Handler) requestPasswordReset(c *gin.Context) {
-	var input struct {
-		Email string `json:"email" binding:"required,email"`
-	}
+	var input requestResetPassword
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	_, err := h.services.Authorization.CreateResetToken(input.Email)
+	token, err := h.services.Authorization.CreateResetToken(input.Email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -66,25 +68,6 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Reset token sent to your email",
+		"token":   token,
 	})
-}
-
-func (h *Handler) resetPassword(c *gin.Context) {
-	var input struct {
-		Email       string `json:"email"`
-		NewPassword string `json:"password"`
-	}
-
-	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
-		return
-	}
-
-	err := h.services.Authorization.ResetPassword(input.Email, input.NewPassword)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "password reset successfully"})
 }

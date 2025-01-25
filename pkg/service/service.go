@@ -10,9 +10,6 @@ type Authorization interface {
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
 	CreateResetToken(email string) (string, error)
-	GetEmailByResetToken(token string) (string, error)
-	UpdatePassword(email, newPassword string) error
-	ResetPassword(email string, newPassword string) error
 }
 
 type NotesyncList interface {

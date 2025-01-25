@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -51,26 +50,4 @@ func (r *AuthPostgres) CreateResetToken(email string) (string, error) {
 	}
 
 	return email, nil // Возвращаем сгенерированный токен
-}
-
-// Реализация метода GetEmailByResetToken
-func (r *AuthPostgres) GetEmailByResetToken(token string) (string, error) {
-	var email string
-
-	// Запрос к базе данных для получения email по токену
-	query := "SELECT email FROM reset_tokens WHERE token = $1"
-	err := r.db.QueryRow(query, token).Scan(&email)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return "", errors.New("token not found")
-		}
-		return "", err
-	}
-
-	return email, nil
-}
-
-// Реализация метода UpdatePassword
-func (r *AuthPostgres) UpdatePassword(email, newPassword string) error {
-	return nil
 }
