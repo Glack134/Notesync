@@ -60,14 +60,13 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.CreateResetToken(input.Email)
+	_, err := h.services.Authorization.CreateResetToken(input.Email)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Reset token sent to your email",
-		"token":   token,
+		"message": "Check to your email",
 	})
 }

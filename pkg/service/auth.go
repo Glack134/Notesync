@@ -81,16 +81,6 @@ func (s *AuthService) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-// Реализация метода CreateResetToken
 func (s *AuthService) CreateResetToken(email string) (string, error) {
-	resetToken, err := s.repo.CreateResetToken(email)
-	if err != nil {
-		return "", err
-	}
-	return resetToken, nil
-}
-
-// Реализация метода ResetPassword
-func (s *AuthService) ResetPassword(email, newPassword string) error {
-	return nil
+	return email, nil
 }
