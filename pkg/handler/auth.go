@@ -48,7 +48,6 @@ func (h *Handler) signIn(c *gin.Context) {
 	})
 }
 
-// auth.go
 func (h *Handler) requestPasswordReset(c *gin.Context) {
 	var input struct {
 		Email string `json:"email" binding:"required,email"`
@@ -73,7 +72,7 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 func (h *Handler) resetPassword(c *gin.Context) {
 	var input struct {
 		Email       string `json:"email"`
-		NewPassword string `json:"new_password"`
+		NewPassword string `json:"password"`
 	}
 
 	if err := c.BindJSON(&input); err != nil {

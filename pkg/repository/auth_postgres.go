@@ -65,24 +65,17 @@ func (r *AuthPostgres) GetEmailByResetToken(token string) (string, error) {
 	err := r.db.QueryRow(query, token).Scan(&email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", errors.New("token not found") // Возвращаем ошибку, если токен не найден
+			return "", errors.New("token not found")
 		}
-		return "", err // Возвращаем другую ошибку
+		return "", err
 	}
 
-	return email, nil // Возвращаем найденный email
+	return email, nil
 }
 
 // Реализация метода UpdatePassword
 func (r *AuthPostgres) UpdatePassword(email, newPassword string) error {
-	// Обновление пароля в базе данных
-	query := "UPDATE users SET password = $1 WHERE email = $2"
-	_, err := r.db.Exec(query, newPassword, email)
-	if err != nil {
-		return err // Возвращаем ошибку, если не удалось обновить пароль
-	}
-
-	return nil // Возвращаем nil, если все прошло успешно
+	return nil
 }
 
 // Вспомогательная функция для генерации токена
