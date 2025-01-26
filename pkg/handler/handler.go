@@ -31,6 +31,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
+		auth.POST("/sign-UpdatePassword", h.UpdatePassword)
 		auth.POST("/request-password-reset", h.requestPasswordReset) // Новый маршрут для сброса пароля
 	}
 
