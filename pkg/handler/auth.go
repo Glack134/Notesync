@@ -61,7 +61,7 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	passwordtoken, err := h.services.Authorization.UpdateTokenPassword(input.Username, input.Password)
+	passwordtoken, err := h.services.Authorization.UpdatePasswordUser(input.Username, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return

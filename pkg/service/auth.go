@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	salt       = "6765fgvbhhgf35vfu9jft5tg"
-	signingKey = "qjvkvnsjdnj2njn29njv**@9un19@!33"
-	tokenTTL   = 12 * time.Hour
+	salt        = "6765fgvbhhgf35vfu9jft5tg"
+	signingKey  = "qjvkvnsjdnj2njn29njv**@9un19@!33"
+	resetingKey = "fa#dh$bsia1*&2rffvsv2135v#eg*#"
+	tokenTTL    = 12 * time.Hour
 )
 
 type tokenClaims struct {
@@ -81,8 +82,19 @@ func (s *AuthService) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func (s *AuthService) UpdateTokenPassword(username, password string) string {
-	return username
+func (s *AuthService) UpdateTokenPassword(username, password string) (string, error) {
+	user, err := s.repo.GetUser(username, s.generatePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
+	passwordtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			IssuedAt:  time.Now().Unix(),
+		},
+		user.Id,
+	})
+	return passwordtoken.SignedString([]byte(resetingKey))
 }
 
 func (s *AuthService) CreateResetToken(email string) (string, error) {
