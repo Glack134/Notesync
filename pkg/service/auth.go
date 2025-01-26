@@ -81,6 +81,10 @@ func (s *AuthService) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
+func (s *AuthService) UpdateTokenPassword(username, password string) string {
+	return username
+}
+
 func (s *AuthService) CreateResetToken(email string) (string, error) {
-	return email, nil
+	return email, nil //заглушка
 }
