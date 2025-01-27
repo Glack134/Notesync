@@ -2,7 +2,7 @@
 services:
   notesync:
     build: ./
-    command: ./wait-for-postgres.sh db ./notesync
+    command: ./notesync
     ports:
       - 8080:8080
     depends_on:

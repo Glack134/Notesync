@@ -1,4 +1,4 @@
-FROM golang:1.14-buster
+FROM golang:1.23
 
 RUN go version
 ENV GOPATH=/
@@ -14,6 +14,6 @@ RUN chmod +x wait-for-postgres.sh
 
 # build go app
 RUN go mod download
-RUN go build -o Notesync ./cmd/main.go
+RUN go build -o notesync ./cmd/main.go
 
-CMD ["./Notesync"]
+CMD ["./notesync"]
