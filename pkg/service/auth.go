@@ -82,19 +82,20 @@ func (s *AuthService) HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func (s *AuthService) UpdateTokenPassword(username, password string) (string, error) {
-	user, err := s.repo.GetUser(username, s.generatePasswordHash(password))
+func (s *AuthService) UpdatePasswordUser(username, password string) (string, error) {
+	user, err := s.repo.UpdatePasswordUser(username, s.generatePasswordHash(password))
 	if err != nil {
 		return "", err
 	}
-	passwordtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
 			IssuedAt:  time.Now().Unix(),
 		},
 		user.Id,
 	})
-	return passwordtoken.SignedString([]byte(resetingKey))
+	return token.SignedString([]byte(signingKey))
 }
 
 func (s *AuthService) CreateResetToken(email string) (string, error) {
