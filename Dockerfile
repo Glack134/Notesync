@@ -1,23 +1,19 @@
-# Используем базовый образ с Go для архитектуры amd64
-FROM --platform=linux/amd64 golang:1.20-buster
+FROM golang:1.14-buster
 
-# Устанавливаем рабочую директорию
-WORKDIR /app
+RUN go version
+ENV GOPATH=/
 
-# Копируем файлы в контейнер
 COPY ./ ./
 
-# Устанавливаем клиент PostgreSQL
-RUN apt-get update && apt-get -y install postgresql-client
+# install psql
+RUN apt-get update
+RUN apt-get -y install postgresql-client
 
-# Скачиваем зависимости
+# make wait-for-postgres.sh executable
+RUN chmod +x wait-for-postgres.sh
+
+# build go app
 RUN go mod download
+RUN go build -o Notesync ./cmd/main.go
 
-# Компилируем приложение для Linux amd64
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o notesync .
-
-# Устанавливаем права на выполнение
-RUN chmod +x notesync
-
-# Указываем команду для запуска приложения
-CMD ["./notesync"]
+CMD ["./Notesync"]

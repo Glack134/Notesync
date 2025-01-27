@@ -1,25 +1,21 @@
-version: '3.8'
 
 services:
-  db:
-    restart: always
-    image: postgres:latest
-    volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=qwe230405180405
-    ports:
-      - 5436:5432
-
   notesync:
     build: ./
-    command: ["./notesync"]
+    command: ./wait-for-postgres.sh db ./notesync
     ports:
       - 8080:8080
     depends_on:
       - db
     environment:
       - DB_PASSWORD=qwe230405180405
-      - DB_HOST=db
-      - DB_PORT=5432
-    platform: linux/amd64  # Убедитесь, что эта строка присутствует
+
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+    - ./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=qwe230405180405
+    ports:
+      - 5436:5432
