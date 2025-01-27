@@ -37,9 +37,12 @@ func (r *AuthPostgres) GetUser(username, password string) (notesync.User, error)
 
 func (r *AuthPostgres) UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error) {
 	var updatepassword notesync.User
-	query := fmt.Sprintf("UPDATE id FROM %s SET password_hash=$1 WHERE username=$2", usersTable)
+	query := fmt.Sprintf("UPDATE %s SET password_hash=$1 WHERE username=$2", usersTable)
 	_, err := r.db.Exec(query, newPasswordHash, username)
-	return updatepassword, err
+	if err != nil {
+		return updatepassword, err
+	}
+	return updatepassword, nil
 }
 
 // Реализация метода CreateResetToken
