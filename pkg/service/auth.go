@@ -1,9 +1,13 @@
 package service
 
 import (
+	"crypto/rand"
 	"crypto/sha1"
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"log"
+	"net/smtp"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -17,6 +21,7 @@ const (
 	signingKey  = "qjvkvnsjdnj2njn29njv**@9un19@!33"
 	resetingKey = "fa#dh$bsia1*&2rffvsv2135v#eg*#"
 	tokenTTL    = 12 * time.Hour
+	tokenEmail  = 10 * time.Minute
 )
 
 type tokenClaims struct {
@@ -98,6 +103,68 @@ func (s *AuthService) UpdatePasswordUser(username, password string) (string, err
 	return token.SignedString([]byte(signingKey))
 }
 
+func GenerateTokenEmail() (string, error) {
+	bytes := make([]byte, 32)
+	_, err := rand.Read(bytes)
+	if err != nil {
+		return "", err
+	}
+	return base64.URLEncoding.EncodeToString(bytes), nil
+}
+
 func (s *AuthService) CreateResetToken(email string) (string, error) {
-	return email, nil //заглушка
+	userID, err := s.repo.GetTokenResetPassword(email)
+	if err != nil {
+		return "", err
+	}
+
+	token, err := GenerateTokenEmail()
+	if err != nil {
+		return "", err
+	}
+
+	expiry := time.Now().Add(tokenEmail)
+	err = s.repo.SaveResetToken(userID, token, expiry)
+	if err != nil {
+		return "", err
+	}
+
+	resetLink := fmt.Sprintf("http://localhost:8080/reset-password?token=%s", token)
+
+	// Теперь отправляем email с ссылкой для сброса пароля
+	subject := "Сброс пароля"
+	body := fmt.Sprintf("Вы запросили сброс пароля. Пожалуйста, перейдите по следующей ссылке, чтобы сбросить ваш пароль: %s", resetLink)
+
+	if err := s.sendEmail(email, subject, body); err != nil {
+		return "", err
+	}
+
+	return resetLink, nil
+}
+
+func (s *AuthService) sendEmail(to string, subject string, body string) error {
+	from := "rbhb05@mail.ru"           // Ваш email
+	password := "WzSr1pB5bnZAhqdCZ6B2" // Ваш пароль от email
+
+	// Настройка SMTP-сервера
+	smtpHost := "smtp.mail.ru" // Замените на ваш SMTP-сервер (например, smtp.gmail.com для Gmail)
+	smtpPort := "587"          // Порт (обычно 587 для TLS)
+
+	// Подготовка сообщения
+	message := []byte("To: " + to + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"\r\n" + body + "\r\n")
+
+	// Аутентификация
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+
+	// Отправка письма
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	if err != nil {
+		log.Printf("Ошибка при отправке email: %s", err)
+		return err
+	}
+
+	log.Printf("Email отправлен на %s", to)
+	return nil
 }

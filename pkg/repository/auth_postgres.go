@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/polyk005/notesync"
@@ -46,18 +47,22 @@ func (r *AuthPostgres) UpdatePasswordUser(username, newPasswordHash string) (not
 }
 
 // Реализация метода CreateResetToken
-func (r *AuthPostgres) CreateResetToken(email string) (string, error) {
-	queryCheck := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
+func (r *AuthPostgres) GetTokenResetPassword(email string) (int, error) {
+	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
 	var userID int
-	err := r.db.QueryRow(queryCheck, email).Scan(&userID)
+	err := r.db.QueryRow(query, email).Scan(&userID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// Если не найдено ни одной строки, возвращаем ошибку, что пользователь не существует
-			return "", fmt.Errorf("user with email %s does not exist", email)
+			return 0, fmt.Errorf("user with email %s does not exist", email)
 		}
-		// Если произошла другая ошибка при выполнении запроса, возвращаем её
-		return "", err
+		return 0, err
 	}
+	return userID, nil
+}
 
-	return email, nil // Возвращаем сгенерированный токен
+// Исправленный метод SaveResetToken
+func (r *AuthPostgres) SaveResetToken(userID int, token string, expiry time.Time) error {
+	query := "INSERT INTO reset_tokens (user_id, token, expiry) VALUES ($1, $2, $3)"
+	_, err := r.db.Exec(query, userID, token, expiry)
+	return err
 }
