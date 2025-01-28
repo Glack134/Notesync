@@ -7,6 +7,15 @@ CREATE TABLE users
     email         varchar(255) not null unique
 );
 
+CREATE TABLE reset_tokens (
+    id serial PRIMARY KEY,
+    user_id int NOT NULL,
+    token varchar(255) NOT NULL,
+    expiry timestamp NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE notesync_lists
 (
     id          serial          not null unique,

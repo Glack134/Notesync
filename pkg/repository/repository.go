@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/polyk005/notesync"
 )
@@ -8,8 +10,9 @@ import (
 type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GetUser(username string, password string) (notesync.User, error)
-	CreateResetToken(email string) (string, error)
+	GetTokenResetPassword(email string) (int, error)
 	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
+	SaveResetToken(userID int, token string, expiry time.Time) error
 }
 
 type NotesyncList interface {

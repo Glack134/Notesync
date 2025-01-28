@@ -61,14 +61,14 @@ func (h *Handler) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	passwordtoken, err := h.services.Authorization.UpdatePasswordUser(input.Username, input.Password)
+	_, err := h.services.Authorization.UpdatePasswordUser(input.Username, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"New password": passwordtoken,
+		"Message": "password update",
 	})
 }
 
