@@ -17,6 +17,7 @@ const (
 	signingKey  = "qjvkvnsjdnj2njn29njv**@9un19@!33"
 	resetingKey = "fa#dh$bsia1*&2rffvsv2135v#eg*#"
 	tokenTTL    = 12 * time.Hour
+	tokenEmail  = 10 * time.Minute
 )
 
 type tokenClaims struct {
