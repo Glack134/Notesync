@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"log"
 	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/joho/godotenv"
 	"github.com/polyk005/notesync"
 	"github.com/polyk005/notesync/pkg/repository"
 	"golang.org/x/crypto/bcrypt"
@@ -143,12 +145,18 @@ func (s *AuthService) CreateResetToken(email string) (string, error) {
 }
 
 func (s *AuthService) sendEmail(to string, subject string, body string) error {
-	from := "rbhb05@mail.ru"           // Ваш email
-	password := "WzSr1pB5bnZAhqdCZ6B2" // Ваш пароль от email
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Ошибка загрузки данных фаил: %s", err)
+		return err
+	}
+
+	from := os.Getenv("EMAIL")
+	password := os.Getenv("EMAIL_PASSWORD")
 
 	// Настройка SMTP-сервера
-	smtpHost := "smtp.mail.ru" // Замените на ваш SMTP-сервер (например, smtp.gmail.com для Gmail)
-	smtpPort := "587"          // Порт (обычно 587 для TLS)
+	smtpHost := "smtp.mail.ru"
+	smtpPort := "587"
 
 	// Подготовка сообщения
 	message := []byte("To: " + to + "\r\n" +
@@ -159,12 +167,12 @@ func (s *AuthService) sendEmail(to string, subject string, body string) error {
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
 	// Отправка письма
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
 	if err != nil {
 		log.Printf("Ошибка при отправке email: %s", err)
 		return err
 	}
 
-	log.Printf("Email отправлен на %s", to)
+	log.Printf("Инструкция по восстановлению отправлена на почту %s", to)
 	return nil
 }
