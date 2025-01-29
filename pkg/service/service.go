@@ -12,7 +12,7 @@ type Authorization interface {
 	UpdatePasswordUser(username, password string) (string, error)
 }
 
-type ResetPassword interface {
+type SendPassword interface {
 	CreateResetToken(email string) (string, error)
 	sendEmail(to string, subject string, body string) error
 }
@@ -35,7 +35,7 @@ type NotesyncItem interface {
 
 type Service struct {
 	Authorization
-	ResetPassword
+	SendPassword
 	NotesyncList
 	NotesyncItem
 }
@@ -43,7 +43,7 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
-		ResetPassword: NewResetPassword(repos.Authorization),
+		SendPassword:  NewSendPassword(repos.SendPassword),
 		NotesyncList:  NewNotesyncListService(repos.NotesyncList),
 		NotesyncItem:  NewNotesyncItemService(repos.NotesyncItem, repos.NotesyncList),
 	}

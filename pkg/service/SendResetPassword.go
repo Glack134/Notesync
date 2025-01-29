@@ -18,10 +18,10 @@ const (
 )
 
 type AuthEmail struct {
-	repo repository.Authorization
+	repo repository.SendPassword
 }
 
-func NewResetPassword(repo repository.Authorization) *AuthEmail {
+func NewSendPassword(repo repository.SendPassword) *AuthEmail {
 	return &AuthEmail{repo: repo}
 }
 

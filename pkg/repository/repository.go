@@ -10,6 +10,10 @@ import (
 type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GetUser(username string, password string) (notesync.User, error)
+	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
+}
+
+type SendPassword interface {
 	GetTokenResetPassword(email string) (int, error)
 	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
 	SaveResetToken(userID int, token string, expiry time.Time) error
@@ -33,6 +37,7 @@ type NotesyncItem interface {
 
 type Repository struct {
 	Authorization
+	SendPassword
 	NotesyncList
 	NotesyncItem
 }
@@ -40,6 +45,7 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		SendPassword:  NewResetPostgres(db),
 		NotesyncList:  NewNotesynsListPostgres(db),
 		NotesyncItem:  NewNotesyncItemPostgres(db),
 	}
