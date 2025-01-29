@@ -9,8 +9,12 @@ type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
-	CreateResetToken(email string) (string, error)
 	UpdatePasswordUser(username, password string) (string, error)
+}
+
+type ResetPassword interface {
+	CreateResetToken(email string) (string, error)
+	sendEmail(to string, subject string, body string) error
 }
 
 type NotesyncList interface {
@@ -31,6 +35,7 @@ type NotesyncItem interface {
 
 type Service struct {
 	Authorization
+	ResetPassword
 	NotesyncList
 	NotesyncItem
 }
@@ -38,6 +43,7 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		ResetPassword: NewResetPassword(repos.Authorization),
 		NotesyncList:  NewNotesyncListService(repos.NotesyncList),
 		NotesyncItem:  NewNotesyncItemService(repos.NotesyncItem, repos.NotesyncList),
 	}
