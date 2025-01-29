@@ -94,3 +94,41 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 		"message": "Check to your email",
 	})
 }
+
+func (h *Handler) ResetPasswordHandler(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		newErrorResponse(c, http.StatusBadRequest, "Token is required")
+		return
+	}
+
+	c.HTML(http.StatusOK, "reset_password.html", gin.H{
+		"token": token,
+	})
+}
+
+func (h *Handler) UpdatePasswordHandler(c *gin.Context) {
+	var input struct {
+		Token    string `json:"token" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	// Пробуем привязать JSON-данные к структуре input
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Здесь вы можете проверить токен на валидность и срок действия
+	// Если токен валиден, обновите пароль
+	err := h.services.Authorization.UpdatePasswordUserToken(input.Token, input.Password)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Возвращаем успешный ответ в формате JSON
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "Пароль успешно обновлен",
+	})
+}

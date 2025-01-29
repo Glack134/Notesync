@@ -51,7 +51,7 @@ func (s *AuthEmail) CreateResetToken(email string) (string, error) {
 		return "", err
 	}
 
-	resetLink := fmt.Sprintf("http://localhost:8080/reset-password?token=%s", token)
+	resetLink := fmt.Sprintf("http://localhost:8080/help/reset-password?token=%s", token)
 
 	// Теперь отправляем email с ссылкой для сброса пароля
 	subject := "Сброс пароля"

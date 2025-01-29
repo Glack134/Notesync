@@ -32,7 +32,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 		auth.POST("/sign-UpdatePassword", h.UpdatePassword)
-		auth.POST("/request-password-reset", h.requestPasswordReset) // Новый маршрут для сброса пароля
+		auth.POST("/request-password-reset", h.requestPasswordReset)
+	}
+
+	help := router.Group("/help")
+	{
+		help.GET("/reset-password", h.ResetPasswordHandler)
+		help.POST("/reset-password", h.UpdatePasswordHandler)
 	}
 
 	api := router.Group("/api", h.userIdentity)

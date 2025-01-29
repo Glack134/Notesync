@@ -10,6 +10,7 @@ type Authorization interface {
 	GenerateToken(username, password string) (string, error)
 	ParseToken(token string) (int, error)
 	UpdatePasswordUser(username, password string) (string, error)
+	UpdatePasswordUserToken(token, newPassword string) error
 }
 
 type SendPassword interface {

@@ -11,6 +11,8 @@ type Authorization interface {
 	CreateUser(user notesync.User) (int, error)
 	GetUser(username string, password string) (notesync.User, error)
 	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
+	GetUserIDByToken(token string) (int, error)
+	UpdatePasswordUserByID(userID int, newPasswordHash string) error
 }
 
 type SendPassword interface {

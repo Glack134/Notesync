@@ -66,3 +66,21 @@ func (r *AuthPostgres) SaveResetToken(userID int, token string, expiry time.Time
 	_, err := r.db.Exec(query, userID, token, expiry)
 	return err
 }
+
+// Получаем userID по токену
+func (r *AuthPostgres) GetUserIDByToken(token string) (int, error) {
+	var userID int
+	query := "SELECT user_id FROM reset_tokens WHERE token=$1 AND expiry > NOW()"
+	err := r.db.QueryRow(query, token).Scan(&userID)
+	if err != nil {
+		return 0, err // Возвращаем ошибку, если токен недействителен
+	}
+	return userID, nil // Возвращаем userID
+}
+
+// Обновляем пароль пользователя по userID
+func (r *AuthPostgres) UpdatePasswordUserByID(userID int, newPasswordHash string) error {
+	query := "UPDATE users SET password_hash=$1 WHERE id=$2"
+	_, err := r.db.Exec(query, newPasswordHash, userID)
+	return err // Возвращаем ошибку, если обновление не удалось
+}
