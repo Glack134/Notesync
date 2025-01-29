@@ -99,20 +99,17 @@ func (s *AuthService) UpdatePasswordUser(username, password string) (string, err
 }
 
 func (s *AuthService) UpdatePasswordUserToken(token, newPassword string) error {
-	// Проверяем валидность токена и получаем userID
 	userID, err := s.repo.GetUserIDByToken(token)
 	if err != nil {
 		return err // Возвращаем ошибку, если токен недействителен
 	}
 
-	// Генерируем хеш нового пароля
 	newPasswordHash := s.generatePasswordHash(newPassword)
 
-	// Обновляем пароль пользователя в базе данных
 	err = s.repo.UpdatePasswordUserByID(userID, newPasswordHash)
 	if err != nil {
-		return err // Возвращаем ошибку, если обновление не удалось
+		return err
 	}
 
-	return nil // Возвращаем nil, если все прошло успешно
+	return nil
 }

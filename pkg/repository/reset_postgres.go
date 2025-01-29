@@ -47,3 +47,13 @@ func (r *ResetPostgres) SaveResetToken(userID int, token string, expiry time.Tim
 	_, err := r.db.Exec(query, userID, token, expiry)
 	return err
 }
+
+func (r *ResetPostgres) UpdateLastRequestTime(token string) error {
+	query := `
+		UPDATE reset_tokens 
+		SET last_request_time = \$1 
+		WHERE token = \$2
+	`
+	_, err := r.db.Exec(query, time.Now(), token)
+	return err
+}

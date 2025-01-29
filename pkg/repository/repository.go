@@ -17,7 +17,6 @@ type Authorization interface {
 
 type SendPassword interface {
 	GetTokenResetPassword(email string) (int, error)
-	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
 	SaveResetToken(userID int, token string, expiry time.Time) error
 }
 
