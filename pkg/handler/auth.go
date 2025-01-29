@@ -96,6 +96,12 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 }
 
 func (h *Handler) ResetPasswordHandler(c *gin.Context) {
+	if c.GetString("passwordResetDone") != "" {
+		// Если пароль уже был сброшен, перенаправляем на главную страницу
+		c.Redirect(http.StatusFound, "/main")
+		return
+	}
+
 	token := c.Query("token")
 	if token == "" {
 		newErrorResponse(c, http.StatusBadRequest, "Token is required")
@@ -126,6 +132,8 @@ func (h *Handler) UpdatePasswordHandler(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	c.Set("passwordResetDone", true)
 
 	// Возвращаем успешный ответ в формате JSON
 	c.JSON(http.StatusOK, map[string]interface{}{
