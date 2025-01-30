@@ -97,7 +97,6 @@ func (h *Handler) requestPasswordReset(c *gin.Context) {
 
 func (h *Handler) ResetPasswordHandler(c *gin.Context) {
 	if c.GetString("passwordResetDone") != "" {
-		// Если пароль уже был сброшен, перенаправляем на главную страницу
 		c.Redirect(http.StatusFound, "/main")
 		return
 	}

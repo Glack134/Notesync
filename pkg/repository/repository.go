@@ -13,6 +13,8 @@ type Authorization interface {
 	UpdatePasswordUser(username, newPasswordHash string) (notesync.User, error)
 	GetUserIDByToken(token string) (int, error)
 	UpdatePasswordUserByID(userID int, newPasswordHash string) error
+	MarkTokenAsUsed(token string) error
+	IsTokenUsed(token string) (bool, error)
 }
 
 type SendPassword interface {

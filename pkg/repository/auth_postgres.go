@@ -46,7 +46,6 @@ func (r *AuthPostgres) UpdatePasswordUser(username, newPasswordHash string) (not
 	return updatepassword, nil
 }
 
-// Реализация метода CreateResetToken
 func (r *AuthPostgres) GetTokenResetPassword(email string) (int, error) {
 	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
 	var userID int
@@ -60,7 +59,6 @@ func (r *AuthPostgres) GetTokenResetPassword(email string) (int, error) {
 	return userID, nil
 }
 
-// Исправленный метод SaveResetToken
 func (r *AuthPostgres) SaveResetToken(userID int, token string, expiry time.Time) error {
 	query := "INSERT INTO reset_tokens (user_id, token, expiry) VALUES ($1, $2, $3)"
 	_, err := r.db.Exec(query, userID, token, expiry)
@@ -73,14 +71,30 @@ func (r *AuthPostgres) GetUserIDByToken(token string) (int, error) {
 	query := "SELECT user_id FROM reset_tokens WHERE token=$1 AND expiry > NOW()"
 	err := r.db.QueryRow(query, token).Scan(&userID)
 	if err != nil {
-		return 0, err // Возвращаем ошибку, если токен недействителен
+		return 0, err
 	}
-	return userID, nil // Возвращаем userID
+	return userID, nil
 }
 
 // Обновляем пароль пользователя по userID
 func (r *AuthPostgres) UpdatePasswordUserByID(userID int, newPasswordHash string) error {
 	query := "UPDATE users SET password_hash=$1 WHERE id=$2"
 	_, err := r.db.Exec(query, newPasswordHash, userID)
-	return err // Возвращаем ошибку, если обновление не удалось
+	return err
+}
+
+func (r *AuthPostgres) MarkTokenAsUsed(token string) error {
+	query := "UPDATE reset_tokens SET used = TRUE WHERE token=$1"
+	_, err := r.db.Exec(query, token)
+	return err
+}
+
+func (r *AuthPostgres) IsTokenUsed(token string) (bool, error) {
+	var isUsed bool
+	query := "SELECT used FROM reset_tokens WHERE token = $1"
+	err := r.db.QueryRow(query, token).Scan(&isUsed)
+	if err != nil {
+		return false, err
+	}
+	return isUsed, nil
 }

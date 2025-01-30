@@ -99,14 +99,27 @@ func (s *AuthService) UpdatePasswordUser(username, password string) (string, err
 }
 
 func (s *AuthService) UpdatePasswordUserToken(token, newPassword string) error {
+	isUsed, err := s.repo.IsTokenUsed(token)
+	if err != nil {
+		return err
+	}
+	if isUsed {
+		return errors.New("token has already been used")
+	}
+
 	userID, err := s.repo.GetUserIDByToken(token)
 	if err != nil {
-		return err // Возвращаем ошибку, если токен недействителен
+		return err
 	}
 
 	newPasswordHash := s.generatePasswordHash(newPassword)
 
 	err = s.repo.UpdatePasswordUserByID(userID, newPasswordHash)
+	if err != nil {
+		return err
+	}
+
+	err = s.repo.MarkTokenAsUsed(token)
 	if err != nil {
 		return err
 	}
