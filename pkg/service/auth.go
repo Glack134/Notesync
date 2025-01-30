@@ -136,15 +136,5 @@ func (s *AuthService) CheckToken(token string) error {
 		return errors.New("token has already been used")
 	}
 
-	lastSentAt, err := s.repo.GetLastSentTime(token)
-	if err != nil {
-		return err
-	}
-
-	// Проверяем, прошло ли 3 минуты с последней отправки
-	if time.Since(lastSentAt) < 3*time.Minute {
-		return errors.New("token can only be sent once every 3 minutes")
-	}
-
 	return nil
 }

@@ -1,15 +1,14 @@
 package service
 
 import (
-	"crypto/rand"
 	"encoding/base64"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/smtp"
 	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/polyk005/notesync/pkg/repository"
 )
 
@@ -57,23 +56,42 @@ func (s *AuthEmail) CreateResetToken(email string) (string, error) {
 	subject := "Сброс пароля"
 	body := fmt.Sprintf("Вы запросили сброс пароля. Пожалуйста, перейдите по следующей ссылке, чтобы сбросить ваш пароль: %s", resetLink)
 
-	if err := s.sendEmail(email, subject, body); err != nil {
+	// Получаем случайный адрес отправителя
+	from, password, err := s.getRandomSender()
+	if err != nil {
+		return "", err
+	}
+
+	if err := s.sendEmail(from, password, email, subject, body); err != nil {
 		return "", err
 	}
 
 	return resetLink, nil
 }
 
-func (s *AuthEmail) sendEmail(to string, subject string, body string) error {
-	err := godotenv.Load()
-	if err != nil {
-		log.Printf("Ошибка загрузки данных фаил: %s", err)
-		return err
+func (s *AuthEmail) getRandomSender() (string, string, error) {
+	// Список адресов отправителей и их паролей
+	senders := []struct {
+		Email    string
+		Password string
+	}{
+		{os.Getenv("EMAIL1"), os.Getenv("EMAIL1_PASSWORD")},
+		{os.Getenv("EMAIL2"), os.Getenv("EMAIL2_PASSWORD")},
+		{os.Getenv("EMAIL3"), os.Getenv("EMAIL3_PASSWORD")},
 	}
 
-	from := os.Getenv("EMAIL")
-	password := os.Getenv("EMAIL_PASSWORD")
+	// Генерация случайного индекса
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(senders))
 
+	if senders[index].Email == "" || senders[index].Password == "" {
+		return "", "", fmt.Errorf("не удалось получить адрес отправителя или пароль")
+	}
+
+	return senders[index].Email, senders[index].Password, nil
+}
+
+func (s *AuthEmail) sendEmail(from string, password string, to string, subject string, body string) error {
 	// Настройка SMTP-сервера
 	smtpHost := "smtp.mail.ru"
 	smtpPort := "587"
@@ -87,7 +105,7 @@ func (s *AuthEmail) sendEmail(to string, subject string, body string) error {
 	auth := smtp.PlainAuth("", from, password, smtpHost)
 
 	// Отправка письма
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, []string{to}, message)
 	if err != nil {
 		log.Printf("Ошибка при отправке email: %s", err)
 		return err

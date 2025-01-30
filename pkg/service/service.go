@@ -16,7 +16,7 @@ type Authorization interface {
 
 type SendPassword interface {
 	CreateResetToken(email string) (string, error)
-	sendEmail(to string, subject string, body string) error
+	sendEmail(from string, password string, to string, subject string, body string) error
 }
 
 type NotesyncList interface {

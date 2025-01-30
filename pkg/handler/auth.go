@@ -145,8 +145,6 @@ func (h *Handler) UpdatePasswordHandler(c *gin.Context) {
 		return
 	}
 
-	c.Set("passwordResetDone", true)
-
 	// Возвращаем успешный ответ в формате JSON
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "Пароль успешно обновлен",
