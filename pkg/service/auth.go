@@ -126,3 +126,15 @@ func (s *AuthService) UpdatePasswordUserToken(token, newPassword string) error {
 
 	return nil
 }
+
+func (s *AuthService) CheckToken(token string) error {
+	isUsed, err := s.repo.IsTokenUsed(token)
+	if err != nil {
+		return err
+	}
+	if isUsed {
+		return errors.New("token has already been used")
+	}
+
+	return nil
+}
