@@ -15,6 +15,7 @@ type Authorization interface {
 	UpdatePasswordUserByID(userID int, newPasswordHash string) error
 	MarkTokenAsUsed(token string) error
 	IsTokenUsed(token string) (bool, error)
+	GetLastSentTime(token string) (time.Time, error)
 }
 
 type SendPassword interface {

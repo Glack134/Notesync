@@ -98,3 +98,12 @@ func (r *AuthPostgres) IsTokenUsed(token string) (bool, error) {
 	}
 	return isUsed, nil
 }
+
+func (r *AuthPostgres) GetLastSentTime(token string) (time.Time, error) {
+	var lastSentAt time.Time
+	err := r.db.QueryRow("SELECT last_sent_at FROM reset_tokens WHERE token = $1", token).Scan(&lastSentAt)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return lastSentAt, nil
+}

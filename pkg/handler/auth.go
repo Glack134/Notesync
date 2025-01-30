@@ -111,16 +111,15 @@ func (h *Handler) ResetPasswordHandler(c *gin.Context) {
 	err := h.services.CheckToken(token)
 	if err != nil {
 		if err.Error() == "token has already been used" {
-			// Если токен уже использован, перенаправляем на главную страницу
 			c.Redirect(http.StatusFound, "/main")
 			return
 		}
-		// Обработка других ошибок
 		newErrorResponse(c, http.StatusInternalServerError, "Internal server error")
 		return
 	}
 
-	// Если токен действителен, отображаем форму сброса пароля
+	c.Set("passwordResetDone", true)
+
 	c.HTML(http.StatusOK, "reset_password.html", gin.H{
 		"token": token,
 	})

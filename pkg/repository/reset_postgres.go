@@ -28,32 +28,16 @@ func (r *ResetPostgres) UpdatePasswordUser(username, newPasswordHash string) (no
 }
 
 // Реализация метода CreateResetToken
-func (r *ResetPostgres) GetTokenResetPassword(email string) (int, error) {
-	query := fmt.Sprintf("SELECT id FROM %s WHERE email=$1", usersTable)
+func (r *ResetPostgres) GetTokenResetPassword(email string) (int, time.Time, error) {
 	var userID int
-	err := r.db.QueryRow(query, email).Scan(&userID)
+	var lastSent time.Time
+	row := r.db.QueryRow("SELECT user_id, last_sent FROM users WHERE email = $1", email)
+	err := row.Scan(&userID, &lastSent)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return 0, fmt.Errorf("user with email %s does not exist", email)
+			return 0, time.Time{}, fmt.Errorf("пользователь с таким email не найден")
 		}
-		return 0, err
+		return 0, time.Time{}, err
 	}
-	return userID, nil
-}
-
-// Исправленный метод SaveResetToken
-func (r *ResetPostgres) SaveResetToken(userID int, token string, expiry time.Time) error {
-	query := "INSERT INTO reset_tokens (user_id, token, expiry) VALUES ($1, $2, $3)"
-	_, err := r.db.Exec(query, userID, token, expiry)
-	return err
-}
-
-func (r *ResetPostgres) UpdateLastRequestTime(token string) error {
-	query := `
-		UPDATE reset_tokens 
-		SET last_request_time = \$1 
-		WHERE token = \$2
-	`
-	_, err := r.db.Exec(query, time.Now(), token)
-	return err
+	return userID, lastSent, nil
 }
