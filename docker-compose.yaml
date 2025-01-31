@@ -8,7 +8,7 @@ services:
     depends_on:
       - db
     environment:
-      - DB_PASSWORD=qwe230405180405
+      - DB_PASSWORD=-
 
   db:
     restart: always
@@ -16,6 +16,6 @@ services:
     volumes:
     - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=qwe230405180405
+      - POSTGRES_PASSWORD=-
     ports:
       - 5436:5432
