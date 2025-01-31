@@ -10,7 +10,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(port string, handler http.Handler, certFile string, keyFile string) error {
 	s.httpServer = &http.Server{
 		Addr:           ":" + port,
 		Handler:        handler,
@@ -18,7 +18,7 @@ func (s *Server) Run(port string, handler http.Handler) error {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 	}
-	return s.httpServer.ListenAndServe()
+	return s.httpServer.ListenAndServeTLS(certFile, keyFile) // Используем ListenAndServeTLS
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {

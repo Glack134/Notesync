@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/polyk005/notesync"
@@ -39,8 +42,18 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	srv := new(notesync.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		logrus.Fatalf("error occured while running http server: %s", err.Error())
+	certFile := "./certs/notesync.crt"
+	keyFile := "./certs/notesync_private_key.pem"
+	if _, err := os.Stat(certFile); os.IsNotExist(err) {
+		log.Fatalf("Сертификат не найден: %s", certFile)
+	}
+	if _, err := os.Stat(keyFile); os.IsNotExist(err) {
+		log.Fatalf("Приватный ключ не найден: %s", keyFile)
+	}
+
+	// Запуск сервера
+	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes(), certFile, keyFile); err != nil {
+		logrus.Fatalf("Ошибка при запуске HTTPS сервера: %s", err.Error())
 	}
 }
 
