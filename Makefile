@@ -1,4 +1,4 @@
-#Start BD --> docker run --name=notesync-db -e POSTGRES_PASSWORD='qwe230405180405' -p 5432:5432 -d --rm postgres
+#Start BD --> docker run --name=notesync-db -e POSTGRES_PASSWORD='' -p 5432:5432 -d --rm postgres
 
 #Start app
 build:
